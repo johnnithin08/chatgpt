@@ -1,5 +1,5 @@
 import { Message } from "@/components/Message";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
 	SafeAreaView,
 	View,
@@ -15,30 +15,36 @@ import {
 } from "react-native";
 
 const Home = () => {
-	const [messages, setMessages] = useState<IMessage[]>([
-		{
-			role: "system",
-			content: "You are good",
-		},
-		{
-			role: "assistant",
-			content: "You are good",
-		},
-		{
-			role: "user",
-			content: "Hello",
-		},
-	]);
-
+	const [messages, setMessages] = useState<IMessage[]>([]);
 	const [prompt, setPrompt] = useState<string>("");
-	const onSend = () => {
-		setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+
+	const flatlistRef = useRef<FlatList | null>(null);
+	const onSend = async () => {
 		setPrompt("");
+		setMessages((prev) => [...prev, { role: "user", content: prompt }]);
+		const result = await fetch("http://localhost:8081/completion", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify([
+				...messages,
+				{ role: "user", content: prompt },
+			]),
+		});
+		const jsonResponse = await result.json();
+		const answer = jsonResponse.choices?.[0].message;
+		setMessages((prev) => [...prev, { ...answer }]);
 	};
-	const container: ViewStyle = {
-		flex: 1,
-		backgroundColor: "#fff",
-	};
+
+	useEffect(() => {
+		setTimeout(() => {
+			if (flatlistRef.current) {
+				flatlistRef.current.scrollToEnd({ animated: true });
+			}
+		}, 100);
+	}, [messages]);
+
 	const inputStyle: StyleProp<TextStyle> = {
 		borderWidth: 1,
 		borderColor: "gainsboro",
@@ -59,6 +65,7 @@ const Home = () => {
 				style={{ flex: 1 }}
 			>
 				<FlatList
+					ref={flatlistRef}
 					data={messages}
 					contentContainerStyle={{ gap: 10, padding: 10 }}
 					renderItem={({ item, index }) => {
