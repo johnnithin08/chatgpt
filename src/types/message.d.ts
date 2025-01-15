@@ -1,4 +1,4 @@
 declare interface IMessage {
-	role: "system" | "user" | "assistant";
+	role: "system" | "user" | "assistant" | "image";
 	content: string;
 }
