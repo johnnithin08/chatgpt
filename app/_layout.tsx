@@ -11,6 +11,7 @@ import { useEffect } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -35,12 +36,20 @@ export default function RootLayout() {
 		<ThemeProvider
 			value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
 		>
-			<Stack initialRouteName="index">
-				<Stack.Screen name="index" options={{ headerShown: false }} />
-				<Stack.Screen name="home" options={{ headerShown: false }} />
-				<Stack.Screen name="+not-found" />
-			</Stack>
-			<StatusBar style="auto" />
+			<SafeAreaProvider>
+				<Stack initialRouteName="index">
+					<Stack.Screen
+						name="index"
+						options={{ headerShown: false }}
+					/>
+					<Stack.Screen
+						name="home"
+						options={{ headerShown: false }}
+					/>
+					<Stack.Screen name="+not-found" />
+				</Stack>
+				<StatusBar style="auto" />
+			</SafeAreaProvider>
 		</ThemeProvider>
 	);
 }

@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from "react";
-import { ViewStyle, TextStyle, View, Text } from "react-native";
+import { ViewStyle, TextStyle, View, Text, Image } from "react-native";
 
 interface IMessageProps {
 	message: IMessage;
@@ -26,16 +26,23 @@ export const Message: FunctionComponent<IMessageProps> = ({
 				},
 			]}
 		>
-			<Text
-				style={[
-					messageText,
-					{
-						color: role === "user" ? "#fff" : "#000",
-					},
-				]}
-			>
-				{content}
-			</Text>
+			{role === "image" ? (
+				<Image
+					source={{ uri: content }}
+					style={{ aspectRatio: 1, width: "100%" }}
+				/>
+			) : (
+				<Text
+					style={[
+						messageText,
+						{
+							color: role === "user" ? "#fff" : "#000",
+						},
+					]}
+				>
+					{content}
+				</Text>
+			)}
 		</View>
 	);
 };
